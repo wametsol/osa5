@@ -190,6 +190,7 @@ class App extends React.Component {
      likedBlog.likes = likedBlog.likes + 1
      
      
+     
      blogService.update(likedBlog._id, likedBlog)
      .then(newBlog => {
       var blogit = this.state.blogs
@@ -210,6 +211,25 @@ class App extends React.Component {
    
 }) 
    }
+
+  handleDelete = (event) => {
+    event.preventDefault()
+    const blogs = this.state.blogs
+    const blogToDelete = blogs.find(blog => blog._id === event.target.value)
+    
+    if(window.confirm(`are you sure you want to delete ${blogToDelete.title}`)){
+      blogService.destroy(event.target.value)
+      blogService.getAll().then(blogs => {
+        blogs = blogs.sort(function(a,b){
+          return b.likes-a.likes
+        })
+        this.setState({ blogs })
+      })
+    }
+    
+    
+
+  }
   
   
   
@@ -261,10 +281,14 @@ class App extends React.Component {
       )
     }
     
-    const like = (blog) => {
-
+    const deleButton = (blog) => {
+     
+      if(blog.user.name===this.state.user.name ||blog.user.name===undefined){
+        return (
+          <button value ={blog._id} onClick={this.handleDelete}>delete</button>
+        )
+      }
     }
-    
     const blogForm = () => {
       
       return(
@@ -289,6 +313,7 @@ class App extends React.Component {
         <li><a href={blog.url}>{blog.url}</a></li>
         <li>{blog.likes}<button  value={blog._id} onClick={this.handleLike}>like</button></li>
         <li>added by {blog.user.name}</li>
+        {deleButton(blog)}
         </Toggleblog>
         </div>
           
