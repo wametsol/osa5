@@ -3,6 +3,8 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './app.css'
+import Togglable from './components/Togglable'
+import Toggleblog from './components/Toggleblog'
 const LoginForm = ({ handleSubmit, handleChange, username, password}) => {
       return (
       <div>
@@ -140,6 +142,7 @@ class App extends React.Component {
   
   addBlog = (event) => {
     event.preventDefault()
+    this.blogForm.toggleVisibility()
     if(this.state.newTitle === "" || this.state.newUrl === ""){
       this.setState({
         error: 'title or url missing'
@@ -181,6 +184,14 @@ class App extends React.Component {
 
 
   render() {
+
+    const blogStyle = {
+      paddingTop: 10,
+      paddingLeft: 2,
+      border: 'solid',
+      borderWidth: 1,
+      marginBottom: 5
+    }
     const Notification = ({ message }) => {
       if (message === null) {
         return null
@@ -203,14 +214,9 @@ class App extends React.Component {
       )
     }
     const loginForm = () => {
-      const hideWhenVisible = { display: this.state.loginVisible ? 'none' : '' }
-      const showWhenVisible = { display: this.state.loginVisible ? '' : 'none' }
-      return (
-      <div>
-      <div style={hideWhenVisible}>
-        <button onClick={e => this.setState({ loginVisible: true })}>log in</button>
-      </div>
-      <div style={showWhenVisible}>
+       return (
+      
+      <Togglable buttonLabel="log in">
         <LoginForm
           visible={this.state.visible}
           username={this.state.username}
@@ -218,22 +224,18 @@ class App extends React.Component {
           handleChange={this.handleLoginFieldChange}
           handleSubmit={this.login}
         />
-        <button onClick={e => this.setState({ loginVisible: false })}>cancel</button>
-      </div>
-        </div>
+        </Togglable>
+        
       )
     }
     
+    
     const blogForm = () => {
-      const hideWhenVisible = { display: this.state.blogcreateVisible ? 'none' : '' }
-      const showWhenVisible = { display: this.state.blogcreateVisible ? '' : 'none' }
+      
       return(
       <div>
-        <div style={hideWhenVisible}>
-        <h2>create new blog</h2>
-        <button onClick={e=> this.setState({blogcreateVisible: true})}>create blog</button>
-        </div>
-        <div style={showWhenVisible}>
+        
+        <Togglable buttonLabel="create blog" ref={component => this.blogForm = component}>
         <BlogForm
         handleAdd={this.addBlog}
         handleChange={this.handleLoginFieldChange}
@@ -241,11 +243,22 @@ class App extends React.Component {
         author={this.state.newAuthor}
         url={this.state.newUrl}
         />
-        <button onClick={e=> this.setState({blogcreateVisible: false})}>cancel</button>
+        </Togglable>
+        {this.state.blogs.map(blog =>
+        
+        <div key={blog._id + 1} style={blogStyle} >
+
+        
+        
+        <Toggleblog buttonLabel={<Blog  key={blog._id} blog={blog} />}>
+        <li><a href={blog.url}>{blog.url}</a></li>
+        <li>{blog.likes}<button>like</button></li>
+        <li>added by {blog.user.name}</li>
+        </Toggleblog>
         </div>
-        {this.state.blogs.map(blog => 
-          <Blog key={blog._id} blog={blog}/>
+          
         )}
+        
       </div>
     )
   }
