@@ -2,7 +2,76 @@ import React from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import './app.css'
+const LoginForm = ({ handleSubmit, handleChange, username, password}) => {
+      return (
+      <div>
+        <h1>Log in to application</h1>
 
+        
+        <form onSubmit={handleSubmit}>
+          <div>
+            username
+            <input
+              type="text"
+              name="username"
+              value={username}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            password
+            <input
+              type="password"
+              name="password"
+              value={password}
+              onChange={handleChange}
+            />
+          </div>
+          <button type="submit">login</button>
+        </form>
+        </div>
+    )}
+
+const BlogForm = ({handleAdd, handleChange, title, author, url}) => {
+      return(
+      <div>
+        <h2>create new blog</h2>
+        <form onSubmit={handleAdd}>
+          <div>
+            title
+            <input
+              type="text"
+              name="newTitle"
+              value={title}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            author
+            <input
+              type="text"
+              name="newAuthor"
+              value={author}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            url
+            <input
+              type="text"
+              name="newUrl"
+              value={url}
+              onChange={handleChange}
+            />
+          </div>
+          <button type="submit">create</button>
+        </form>
+
+        
+      </div>
+    )
+  }
 class App extends React.Component {
   constructor(props) {
     super(props)
@@ -14,7 +83,10 @@ class App extends React.Component {
       username: '',
       password: '',
       user: null,
-      error: ''
+      error: null,
+      success: null,
+      loginVisible:false,
+      blogcreateVisible:false
     }
   }
   
@@ -40,7 +112,10 @@ class App extends React.Component {
       })
       window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
       blogService.setToken(user.token)
-      this.setState({ username: '', password: '', user})
+      this.setState({ username: '', password: '',success: 'logging succesfull', user})
+      setTimeout(() => {
+        this.setState({success: null})
+      }, 5000);
     } catch(exception){
       this.setState({
         error: 'wrong user or password'
@@ -57,26 +132,51 @@ class App extends React.Component {
   handleLogOut = (event) => {
     
     window.localStorage.removeItem('loggedBlogUser')
-    this.setState({user:null})
+    this.setState({user:null, success:'logging out succesfull'})
+    setTimeout(() => {
+      this.setState({success: null})
+    }, 5000);
   }
   
   addBlog = (event) => {
     event.preventDefault()
+    if(this.state.newTitle === "" || this.state.newUrl === ""){
+      this.setState({
+        error: 'title or url missing'
+      })
+      setTimeout(() => {
+        this.setState({error: null})
+      }, 5000);
+      return
+    }
+    else {
     const blogObject = {
       title: this.state.newTitle,
       author: this.state.newAuthor,
       url: this.state.newUrl
     }
+    
     blogService.create(blogObject)
     .then(newBlog => {
       this.setState({
+        success: `a new blog'${this.state.newTitle}' by ${this.state.newAuthor} has been added`,
         blogs: this.state.blogs.concat(newBlog),
         newTitle: '',
         newAuthor: '',
         newUrl: ''
+          
+        
 
       })
+      setTimeout(() => {
+        this.setState({success:null})
+      }, 5000);
     })
+  }
+  
+    
+  
+  
   }
 
 
@@ -85,84 +185,75 @@ class App extends React.Component {
       if (message === null) {
         return null
       }
+      if (this.state.error === null){
+        return(
+          <div className="success">
+        
+         <h2  > {message}</h2>
+        </div>
+        )
+      }
+      
       return (
+        
         <div className="error">
-         <h2 style={{color:"red"}}> {message}</h2>
+        
+         <h2  > {message}</h2>
         </div>
       )
     }
-    const loginForm = () => (
+    const loginForm = () => {
+      const hideWhenVisible = { display: this.state.loginVisible ? 'none' : '' }
+      const showWhenVisible = { display: this.state.loginVisible ? '' : 'none' }
+      return (
       <div>
-        <h1>Log in to application</h1>
-
-        
-        <form onSubmit={this.login}>
-          <div>
-            username
-            <input
-              type="text"
-              name="username"
-              value={this.state.username}
-              onChange={this.handleLoginFieldChange}
-            />
-          </div>
-          <div>
-            password
-            <input
-              type="password"
-              name="password"
-              value={this.state.password}
-              onChange={this.handleLoginFieldChange}
-            />
-          </div>
-          <button type="submit">login</button>
-        </form>
+      <div style={hideWhenVisible}>
+        <button onClick={e => this.setState({ loginVisible: true })}>log in</button>
+      </div>
+      <div style={showWhenVisible}>
+        <LoginForm
+          visible={this.state.visible}
+          username={this.state.username}
+          password={this.state.password}
+          handleChange={this.handleLoginFieldChange}
+          handleSubmit={this.login}
+        />
+        <button onClick={e => this.setState({ loginVisible: false })}>cancel</button>
+      </div>
         </div>
-    )
-    const blogForm = () => (
+      )
+    }
+    
+    const blogForm = () => {
+      const hideWhenVisible = { display: this.state.blogcreateVisible ? 'none' : '' }
+      const showWhenVisible = { display: this.state.blogcreateVisible ? '' : 'none' }
+      return(
       <div>
+        <div style={hideWhenVisible}>
         <h2>create new blog</h2>
-        <form onSubmit={this.addBlog}>
-          <div>
-            title
-            <input
-              type="text"
-              name="newTitle"
-              value={this.state.newTitle}
-              onChange={this.handleLoginFieldChange}
-            />
-          </div>
-          <div>
-            author
-            <input
-              type="text"
-              name="newAuthor"
-              value={this.state.newAuthor}
-              onChange={this.handleLoginFieldChange}
-            />
-          </div>
-          <div>
-            url
-            <input
-              type="text"
-              name="newUrl"
-              value={this.state.newUrl}
-              onChange={this.handleLoginFieldChange}
-            />
-          </div>
-          <button type="submit">create</button>
-        </form>
-
+        <button onClick={e=> this.setState({blogcreateVisible: true})}>create blog</button>
+        </div>
+        <div style={showWhenVisible}>
+        <BlogForm
+        handleAdd={this.addBlog}
+        handleChange={this.handleLoginFieldChange}
+        title={this.state.newTitle}
+        author={this.state.newAuthor}
+        url={this.state.newUrl}
+        />
+        <button onClick={e=> this.setState({blogcreateVisible: false})}>cancel</button>
+        </div>
         {this.state.blogs.map(blog => 
           <Blog key={blog._id} blog={blog}/>
         )}
       </div>
     )
-    
+  }
     return (
       <div>
         <h1>Blogs</h1>
-        <Notification message={this.state.error}/>
+        <Notification message={this.state.error} />
+        <Notification message={this.state.success} />
         
         {this.state.user === null ?
         loginForm() :
