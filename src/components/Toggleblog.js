@@ -23,8 +23,9 @@ class Toggleblog extends React.Component {
           </div>
           <div style={showWhenVisible}>
             <a onClick={this.toggleVisibility}>{this.props.buttonLabel}
-            {this.props.children}
+            
             </a>
+            {this.props.children}
           </div>
         </div>
       )

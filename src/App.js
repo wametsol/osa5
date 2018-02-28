@@ -176,11 +176,45 @@ class App extends React.Component {
       }, 5000);
     })
   }
+}
   
+   handleLike = (event) => {
+     event.preventDefault()
     
+     const blogs = this.state.blogs
+     const likedBlog = blogs.find(blog => blog._id === event.target.value) 
+     
+     likedBlog.likes = likedBlog.likes + 1
+     
+     
+     blogService.update(likedBlog._id, likedBlog)
+     .then(newBlog => {
+      this.setState({
+        success: `you liked'${newBlog.title}' by ${newBlog.author} `
+          
+        
+
+      })
+      setTimeout(() => {
+        this.setState({success:null})
+      }, 2000);
+         
+     /*
+     const blogObject = {
+       title: blog.title,
+       author: blog.author,
+       url: blog.url,
+       user: blog.user._id,
+       likes: blog.likes+1
+     }
+     blogService.update(blog._id, blogObject)
+*/
+   
+}) 
+   }
   
   
-  }
+  
 
 
   render() {
@@ -229,6 +263,9 @@ class App extends React.Component {
       )
     }
     
+    const like = (blog) => {
+
+    }
     
     const blogForm = () => {
       
@@ -250,9 +287,9 @@ class App extends React.Component {
 
         
         
-        <Toggleblog buttonLabel={<Blog  key={blog._id} blog={blog} />}>
+        <Toggleblog buttonLabel={<Blog  key={blog.user._id} blog={blog} />}>
         <li><a href={blog.url}>{blog.url}</a></li>
-        <li>{blog.likes}<button>like</button></li>
+        <li>{blog.likes}<button  value={blog._id} onClick={this.handleLike}>like</button></li>
         <li>added by {blog.user.name}</li>
         </Toggleblog>
         </div>
