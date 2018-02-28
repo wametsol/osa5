@@ -8,6 +8,9 @@ class App extends React.Component {
     super(props)
     this.state = {
       blogs: [],
+      newTitle: '',
+      newUrl: '',
+      newAuthor: '',
       username: '',
       password: '',
       user: null,
@@ -56,6 +59,25 @@ class App extends React.Component {
     window.localStorage.removeItem('loggedBlogUser')
     this.setState({user:null})
   }
+  
+  addBlog = (event) => {
+    event.preventDefault()
+    const blogObject = {
+      title: this.state.newTitle,
+      author: this.state.newAuthor,
+      url: this.state.newUrl
+    }
+    blogService.create(blogObject)
+    .then(newBlog => {
+      this.setState({
+        blogs: this.state.blogs.concat(newBlog),
+        newTitle: '',
+        newAuthor: '',
+        newUrl: ''
+
+      })
+    })
+  }
 
 
   render() {
@@ -99,6 +121,38 @@ class App extends React.Component {
     )
     const blogForm = () => (
       <div>
+        <h2>create new blog</h2>
+        <form onSubmit={this.addBlog}>
+          <div>
+            title
+            <input
+              type="text"
+              name="newTitle"
+              value={this.state.newTitle}
+              onChange={this.handleLoginFieldChange}
+            />
+          </div>
+          <div>
+            author
+            <input
+              type="text"
+              name="newAuthor"
+              value={this.state.newAuthor}
+              onChange={this.handleLoginFieldChange}
+            />
+          </div>
+          <div>
+            url
+            <input
+              type="text"
+              name="newUrl"
+              value={this.state.newUrl}
+              onChange={this.handleLoginFieldChange}
+            />
+          </div>
+          <button type="submit">create</button>
+        </form>
+
         {this.state.blogs.map(blog => 
           <Blog key={blog._id} blog={blog}/>
         )}
