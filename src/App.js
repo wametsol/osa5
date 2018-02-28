@@ -94,9 +94,12 @@ class App extends React.Component {
   
 
   componentDidMount() {
-    blogService.getAll().then(blogs =>
+    blogService.getAll().then(blogs => {
+      blogs = blogs.sort(function(a,b){
+        return b.likes-a.likes
+      })
       this.setState({ blogs })
-    )
+    })
     const loggedUserJSON = window.localStorage.getItem('loggedBlogUser')
     if (loggedUserJSON){
       const user = JSON.parse(loggedUserJSON)
@@ -189,8 +192,14 @@ class App extends React.Component {
      
      blogService.update(likedBlog._id, likedBlog)
      .then(newBlog => {
+      var blogit = this.state.blogs
+      blogit.sort(function(a,b){
+        return b.likes-a.likes
+      })
       this.setState({
-        success: `you liked'${newBlog.title}' by ${newBlog.author} `
+        success: `you liked'${newBlog.title}' by ${newBlog.author} `,
+        blogs: blogit
+        
           
         
 
@@ -198,17 +207,6 @@ class App extends React.Component {
       setTimeout(() => {
         this.setState({success:null})
       }, 2000);
-         
-     /*
-     const blogObject = {
-       title: blog.title,
-       author: blog.author,
-       url: blog.url,
-       user: blog.user._id,
-       likes: blog.likes+1
-     }
-     blogService.update(blog._id, blogObject)
-*/
    
 }) 
    }
