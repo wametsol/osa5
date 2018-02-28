@@ -20,6 +20,12 @@ class App extends React.Component {
     blogService.getAll().then(blogs =>
       this.setState({ blogs })
     )
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogUser')
+    if (loggedUserJSON){
+      const user = JSON.parse(loggedUserJSON)
+      this.setState({user})
+      blogService.setToken(user.token)
+    }
   } 
 
   login = async (event) => {
@@ -29,11 +35,9 @@ class App extends React.Component {
         username: this.state.username,
         password: this.state.password
       })
-     
-      
+      window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
+      blogService.setToken(user.token)
       this.setState({ username: '', password: '', user})
-      
-      
     } catch(exception){
       this.setState({
         error: 'wrong user or password'
@@ -46,6 +50,11 @@ class App extends React.Component {
 
   handleLoginFieldChange = (event) => {
     this.setState({ [event.target.name]: event.target.value})
+  }
+  handleLogOut = (event) => {
+    
+    window.localStorage.removeItem('loggedBlogUser')
+    this.setState({user:null})
   }
 
 
@@ -60,12 +69,11 @@ class App extends React.Component {
         </div>
       )
     }
-    if(this.state.user === null){
-      return(
-        <div>
+    const loginForm = () => (
+      <div>
         <h1>Log in to application</h1>
 
-        <Notification message={this.state.error}/>
+        
         <form onSubmit={this.login}>
           <div>
             username
@@ -88,17 +96,31 @@ class App extends React.Component {
           <button type="submit">login</button>
         </form>
         </div>
-      )
-    }
-    return (
+    )
+    const blogForm = () => (
       <div>
-        <p style={{color:"green"}}>{this.state.user.name} logged in </p>
-
         {this.state.blogs.map(blog => 
           <Blog key={blog._id} blog={blog}/>
         )}
       </div>
-    );
+    )
+    
+    return (
+      <div>
+        <h1>Blogs</h1>
+        <Notification message={this.state.error}/>
+        
+        {this.state.user === null ?
+        loginForm() :
+        <div>
+          <p style={{color:"green"}}>{this.state.user.name} logged in
+           <button onClick={this.handleLogOut}>logout</button></p>
+          {blogForm()}
+        </div>
+        }
+      </div>
+      
+    )
   }
 }
 
