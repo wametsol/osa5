@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 class Toggleblog extends React.Component {
     constructor(props) {
@@ -30,5 +31,8 @@ class Toggleblog extends React.Component {
         </div>
       )
     }
+  }
+  Toggleblog.propTypes = {
+    buttonLabel: PropTypes.object.isRequired
   }
   export default Toggleblog

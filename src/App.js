@@ -5,6 +5,7 @@ import loginService from './services/login'
 import './app.css'
 import Togglable from './components/Togglable'
 import Toggleblog from './components/Toggleblog'
+import PropTypes from 'prop-types'
 const LoginForm = ({ handleSubmit, handleChange, username, password}) => {
       return (
       <div>
@@ -34,6 +35,12 @@ const LoginForm = ({ handleSubmit, handleChange, username, password}) => {
         </form>
         </div>
     )}
+    LoginForm.propTypes = {
+      handleSubmit: PropTypes.func.isRequired,
+      handleChange: PropTypes.func.isRequired,
+      username: PropTypes.string.isRequired,
+      password: PropTypes.string.isRequired
+    }
 
 const BlogForm = ({handleAdd, handleChange, title, author, url}) => {
       return(
@@ -309,7 +316,7 @@ class App extends React.Component {
 
         
         
-        <Toggleblog buttonLabel={<Blog  key={blog.user._id} blog={blog} />}>
+        <Toggleblog buttonLabel={<Blog key={blog.user._id} blog={blog} />}>
         <li><a href={blog.url}>{blog.url}</a></li>
         <li>{blog.likes}<button  value={blog._id} onClick={this.handleLike}>like</button></li>
         <li>added by {blog.user.name}</li>

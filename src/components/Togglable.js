@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 
 class Togglable extends React.Component {
     constructor(props) {
@@ -7,6 +8,7 @@ class Togglable extends React.Component {
         visible: false
       }
     }
+    
   
     toggleVisibility = () => {
       this.setState({visible: !this.state.visible})
@@ -28,5 +30,8 @@ class Togglable extends React.Component {
         </div>
       )
     }
+  }
+  Togglable.propTypes = {
+    buttonLabel: PropTypes.string.isRequired
   }
   export default Togglable
