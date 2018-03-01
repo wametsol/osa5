@@ -20,9 +20,9 @@ class Toggleblog extends React.Component {
       return (
         <div>
           <div style={hideWhenVisible}>
-            <a onClick={this.toggleVisibility}>{this.props.buttonLabel}</a>
+            <a className="togglableBlog"onClick={this.toggleVisibility}>{this.props.buttonLabel}</a>
           </div>
-          <div style={showWhenVisible}>
+          <div style={showWhenVisible} className="togglableContent">
             <a onClick={this.toggleVisibility}>{this.props.buttonLabel}
             
             </a>
